@@ -8,7 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export function BalanceList() {
   const insets = useSafeAreaInsets();
   const { data: balancesData, isLoading, error, refetch } = useGetBalances();
-  const { setBalances } = useMainStore();
+  const { setBalances, claimedUSDT, claimedBTC, claimedETH } = useMainStore();
 
   useEffect(() => {
     if (balancesData) {
@@ -57,13 +57,27 @@ export function BalanceList() {
 
       <View style={styles.totalClaimed}>
         <Text style={styles.totalClaimedText}>Total claimed</Text>
+        <View style={styles.claimedRows}>
+          <View style={styles.claimedRow}>
+            <Text style={styles.claimedAsset}>USDT</Text>
+            <Text style={styles.claimedAmount}>{claimedUSDT}</Text>
+          </View>
+          <View style={styles.claimedRow}>
+            <Text style={styles.claimedAsset}>BTC</Text>
+            <Text style={styles.claimedAmount}>{claimedBTC}</Text>
+          </View>
+          <View style={styles.claimedRow}>
+            <Text style={styles.claimedAsset}>ETH</Text>
+            <Text style={styles.claimedAmount}>{claimedETH}</Text>
+          </View>
+        </View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
+  root: {    
     flex: 1,
     backgroundColor: '#0E1216',
   },
@@ -104,9 +118,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   totalClaimed: {
-    padding: 24,
+    paddingHorizontal: 16,
+    paddingTop: 16,
     paddingBottom: 12,
-    gap: 4,
+    gap: 12,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: '#2A3139',
   },
@@ -114,5 +129,27 @@ const styles = StyleSheet.create({
     color: '#F4F7FA',
     fontSize: 20,
     fontWeight: '700',
+  },
+  claimedRows: {
+    gap: 0,
+  },
+  claimedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#2A3139',
+  },
+  claimedAsset: {
+    color: '#C5CED8',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  claimedAmount: {
+    color: '#F4F7FA',
+    fontSize: 15,
+    fontWeight: '600',
+    fontVariant: ['tabular-nums'],
   },
 });
