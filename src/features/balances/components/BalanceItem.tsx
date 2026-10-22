@@ -1,9 +1,9 @@
-import { Button, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Button, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 
 import type { AssetType, BalanceItem as BalanceItemData } from '@/core/api/base.api';
 import { useGetClaimOptions } from '@/core/api/hooks/useBaseQueries';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type BalanceItemProps = {
   item: BalanceItemData;
@@ -42,30 +42,52 @@ export function BalanceItem({ item }: BalanceItemProps) {
   const ticker = asset.slice(0, 1).toUpperCase();
   const [modalVisible, setModalVisible] = useState(false);
   const [modalInput, setModalInput] = useState('');
+  const [currentAsset, setCurrentAsset] = useState<AssetType>(asset as AssetType);
 
-  const { data: claimOptions } = useGetClaimOptions(asset as AssetType);
+  const { data: claimOptions, isLoading: isLoadingClaimOptions, refetch: refetchClaimOptions } = useGetClaimOptions(currentAsset as AssetType);
+
+  useEffect(() => {
+    refetchClaimOptions();
+  }, [modalVisible]);
+
+  const renderModalContent = () => {
+    return (
+      <>  
+        <Text style={styles.modalTitle}>{asset}</Text>
+        <Text style={styles.modalDescription}>{ `Min amount: ${claimOptions?.minAmount}`}</Text>
+        <Text style={styles.modalDescription}>{ `Fee: ${claimOptions?.fee}`}</Text>
+        <Text style={styles.modalDescription}>Destinations:</Text>
+        <Text style={styles.modalDescription}>{claimOptions?.destinations.map(destination => destination.label).join(', ')}</Text>
+
+        <Text style={styles.modalDescription}>You will receive:</Text>
+        <Text style={styles.modalDescription}>{ `${Number(modalInput) - Number(claimOptions?.fee)}`}</Text>          
+
+        <TextInput style={styles.modalInput} value={modalInput} onChangeText={setModalInput} placeholder="Amount" keyboardType="numeric" />
+
+        <View style={styles.modalButtons}>
+          <Button title="Max" onPress={() => setModalInput(available)} />
+          <Button title="Claim" onPress={() => {}} />
+        </View>
+      </>
+    )
+  }
 
   return (
     <>
       <Modal animationType="slide" visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>{asset}</Text>
-          <Text style={styles.modalDescription}>{ `Min amount: ${claimOptions?.minAmount}`}</Text>
-          <Text style={styles.modalDescription}>{ `Fee: ${claimOptions?.fee}`}</Text>
-          <Text style={styles.modalDescription}>Destinations:</Text>
-          <Text style={styles.modalDescription}>{claimOptions?.destinations.map(destination => destination.label).join(', ')}</Text>
-
-          <TextInput style={styles.modalInput} value={modalInput} onChangeText={setModalInput} placeholder="Amount" keyboardType="numeric" />
-
-          <View style={styles.modalButtons}>
-            <Button title="Max" onPress={() => setModalInput(available)} />
-            <Button title="Claim" onPress={() => {}} />
-          </View>
+          {
+            isLoadingClaimOptions ? (
+              <ActivityIndicator size="large" color="#F4F7FA" />
+            ) : (
+              renderModalContent()
+            )
+          }
         </View>
       
         <Button title="Close" onPress={() => setModalVisible(false)} />
       </Modal>
-      <Pressable onPress={() => setModalVisible(true)} style={styles.row}>
+      <Pressable onPress={() => { setModalVisible(true); setCurrentAsset(asset as AssetType); }} style={styles.row}>
         <View style={styles.left}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{ticker}</Text>
