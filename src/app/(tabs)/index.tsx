@@ -1,18 +1,20 @@
+import { deviceStorage } from "@/core/storage/deviceStorage";
 import useMainStore from "@/core/store/mainStore";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function HomeScreen() {
-  const { apiKey, setApiKey } = useMainStore();
+  const { setApiKey } = useMainStore();
   const [apiKeyInput, setApiKeyInput] = useState<string | null>(null);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (apiKeyInput && apiKeyInput.length > 10) {
+      await deviceStorage.setApiKey(apiKeyInput);
       setApiKey(apiKeyInput);
       router.push('/home');
     }
-  }
+  };
   
   return (
     <View style={styles.container}>

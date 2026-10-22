@@ -1,16 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { baseApi } from '../base.api';
 
-// Ключи запросов выносим в константы для предотвращения опечаток
 export const baseKeys = {  
-  catFact: ['catFact'] as const,
+  balances: ['balances'] as const,
 };
 
-// Хук для получения данных (Query)
-export function useCatFact() {
+export function useGetBalances() {
   return useQuery({
-    queryKey: baseKeys.catFact,
-    queryFn: () => baseApi.getCatFact(),
+    queryKey: baseKeys.balances,
+    queryFn: () => baseApi.getBalances(),
     // enabled: !!userId, // запрос не пойдет, если нет id
   });
 }

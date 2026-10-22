@@ -1,13 +1,22 @@
-import { apiClient } from '../api/client';
+import { apiClient } from '@/core/api/client';
 
-export interface CatFact {
-  fact: string;
-  length: number;
+export interface BalanceItem {
+  asset: string;
+  decimals: number;
+  available: string;
+  pending: string;
+  claiming: string;
+  usdPrice: string;
 }
 
-export const baseApi = {  
-  getCatFact: async (): Promise<CatFact> => {
-    const { data } = await apiClient.get(`/fact`, { params: { max_length: 140 } });
+export interface BalancesResponse {
+  asOf: string;
+  items: BalanceItem[];
+}
+
+export const baseApi = {
+  getBalances: async (): Promise<BalancesResponse> => {
+    const { data } = await apiClient.get(`/v1/balances`);
     return data;
   },
 };
